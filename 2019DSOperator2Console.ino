@@ -35,6 +35,11 @@ const int mediumHeightLEDPin = 31;
 const int mediumHeightJoystickButton = 3;
 Bounce mediumHeightPushButton = Bounce(mediumHeightButtonPin, debounceTimeInMs);
 
+// Active pin and helper class definitions
+const int activateButtonPin = 30;
+const int activateJoystickButton = 4;
+Bounce activatePushButton = Bounce(activateButtonPin, debounceTimeInMs);
+
 // This is run once at device startup
 void setup() {
   // Setup pins for ball/hatch button control
@@ -46,12 +51,16 @@ void setup() {
   pinMode(ballLEDPin, OUTPUT);
   pinMode(hatchLEDPin, OUTPUT);
   pinMode(ballHatchButtonPin, INPUT_PULLUP);      // Note that this makes the UNPRESSED state HIGH.
-  digitalWrite(hatchLEDPin, HIGH);
+  digitalWrite(hatchLEDPin, LOW);
+  digitalWrite(ballLEDPin, LOW);
 
   // Setup pins for medium height control
   pinMode(mediumHeightLEDPin, OUTPUT);
   pinMode(mediumHeightButtonPin, INPUT_PULLUP);   // Note that this makes the UNPRESSED state HIGH.
   digitalWrite(mediumHeightLEDPin, LOW);          // The default is low, but this is good form.
+
+  // Setup pins for activate control
+  pinMode(activateButtonPin, INPUT_PULLUP);
 }
 
 // This runs forever
@@ -60,10 +69,16 @@ void loop() {
   // Take care of the ball/hatch button
   if (ballHatchPushButton.update()) {
     if (ballHatchPushButton.fallingEdge()) {
-      // toggle leds
-      digitalWrite(hatchLEDPin, !digitalRead(hatchLEDPin));
-      digitalWrite(ballLEDPin, !digitalRead(ballLEDPin));
-
+      // Ball was the first LED on the whiteboard, so if we are in the
+      // 'None' state, then make the ball LED turn on.
+      if (digitalRead(hatchLEDPin) == LOW && digitalRead(ballLEDPin) == LOW) {
+        digitalWrite(ballLEDPin, HIGH);
+      } else {
+        // toggle leds
+        digitalWrite(hatchLEDPin, !digitalRead(hatchLEDPin));
+        digitalWrite(ballLEDPin, !digitalRead(ballLEDPin));
+      }
+      
       // Simulate pressing Joystick buttons
       if (digitalRead(hatchLEDPin)) {
         Joystick.button(hatchJoystickButton, HIGH);
@@ -85,10 +100,22 @@ void loop() {
     if (mediumHeightPushButton.fallingEdge()) {
       // toggle led
       digitalWrite(mediumHeightLEDPin, !digitalRead(mediumHeightLEDPin));
-      // Simulate pressing Joystick buttons
+      // Simulate pressing Joystick button
       Joystick.button(mediumHeightJoystickButton, HIGH);
     } else if (mediumHeightPushButton.risingEdge()) {
+      // Simulate releasing Joystick button
       Joystick.button(mediumHeightJoystickButton, LOW);
+    }
+  }
+
+  // Take care of the activate button
+  if (activatePushButton.update()) {
+    if (activatePushButton.fallingEdge()) {
+      // Simulate pressing Joystick button
+      Joystick.button(activateJoystickButton, HIGH);
+    } else if (activatePushButton.risingEdge()) {
+      // Simulate pressing Joystick button
+      Joystick.button(activateJoystickButton, LOW);      
     }
   }
 }
