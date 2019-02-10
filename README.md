@@ -1,5 +1,5 @@
 # 2019DSOperator2Console
-Arduino sketch for [Teensyduino 3.5](https://www.pjrc.com/store/teensy35.html) implementation of operator 2 custom console.
+Arduino sketch for [Teensyduino 3.5](https://www.pjrc.com/store/teensy35.html) implementation of operator 2 custom console firmware.
 
 ## To Update Firmware
 1. Download and install [Arduino](https://www.arduino.cc/en/Main/Software) for your development platform
