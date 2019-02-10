@@ -1,19 +1,63 @@
 #include <Bounce.h>
 
+/*
+ *  This is firmware for the Spartan Robotics 2019 Deepspace driver 2 operator console. 
+ *  
+ *  Note that the Teensy 3.5 USB HID firmware supports up to 32 joystick buttons per joystick
+ *  HID device, however the FRC driver station only supports up to 16 joystick buttons per USB device.
+ *  The Teensy 3.5 has up to 57 (yes fifty-seven!) DIO pins, so it has more than enough to accomodate
+ *  the number of physical LEDs and buttons we can imagine.
+ *  
+ *  Further, note that the Freescale chip recommended max current draw for output pins (the LEDS)
+ *  is a skimpy 9mA and absolute max of 25mA. We need to use red LEDs since their voltage requirement
+ *  is the lowest (~1.8V) and we need to put the largest current limiting resistor we can to make it
+ *  reasonable visible enough. To calculate, use ohms law: V = IR. The Teensy is a 3.3V device. So,
+ *  (3.3V - 1.8V) = 0.009A * R. R = 166 ohm resistor so maybe round up to next largest of 180 ohms. On
+ *  my demo, I used 330 ohm and they were visible looking straight on but kinda dim from an angle.
+ *  Somewhere in between would probably work great.
+ *  
+ */
+ 
+// Debounce settings
+const int debounceTimeInMs = 10;
+
+// Ball/Hatch pin and helper class definitions
 const int ballHatchButtonPin = 35;
 const int ballLEDPin = 33;
+const int ballJoystickButton = 2; 
 const int hatchLEDPin = 34;
-Bounce ballHatchPushButton = Bounce(ballHatchButtonPin, 10);  // 10 ms debounce
+const int hatchJoystickButton = 1;
+Bounce ballHatchPushButton = Bounce(ballHatchButtonPin, debounceTimeInMs);
 
+// Medium height pin and helper class definitions
+const int mediumHeightButtonPin = 32;
+const int mediumHeightLEDPin = 31;
+const int mediumHeightJoystickButton = 3;
+Bounce mediumHeightPushButton = Bounce(mediumHeightButtonPin, debounceTimeInMs);
+
+// This is run once at device startup
 void setup() {
-  // put your setup code here, to run once:
+  // Setup pins for ball/hatch button control
+  // Note that we start out the hatch pin HIGH just
+  // for demonstration purposes, but this control is 
+  // actually a tri-state control - Ball, Hatch, or nothing,
+  // so this should probably change to make none of these LEDs
+  // on at startup.
   pinMode(ballLEDPin, OUTPUT);
   pinMode(hatchLEDPin, OUTPUT);
-  pinMode(ballHatchButtonPin, INPUT_PULLUP);
+  pinMode(ballHatchButtonPin, INPUT_PULLUP);      // Note that this makes the UNPRESSED state HIGH.
   digitalWrite(hatchLEDPin, HIGH);
+
+  // Setup pins for medium height control
+  pinMode(mediumHeightLEDPin, OUTPUT);
+  pinMode(mediumHeightButtonPin, INPUT_PULLUP);   // Note that this makes the UNPRESSED state HIGH.
+  digitalWrite(mediumHeightLEDPin, LOW);          // The default is low, but this is good form.
 }
 
+// This runs forever
 void loop() {
+  
+  // Take care of the ball/hatch button
   if (ballHatchPushButton.update()) {
     if (ballHatchPushButton.fallingEdge()) {
       // toggle leds
@@ -22,17 +66,29 @@ void loop() {
 
       // Simulate pressing Joystick buttons
       if (digitalRead(hatchLEDPin)) {
-        Joystick.button(1, 1);
+        Joystick.button(hatchJoystickButton, HIGH);
       } else if (digitalRead(ballLEDPin)) {
-        Joystick.button(2, 1);
+        Joystick.button(ballJoystickButton, HIGH);
       }
     } else if (ballHatchPushButton.risingEdge()) {
       // Simulate releasing Joystick buttons
       if (digitalRead(hatchLEDPin)) {
-        Joystick.button(1, 0);
+        Joystick.button(hatchJoystickButton, LOW);
       } else if (digitalRead(ballLEDPin)) {
-        Joystick.button(2, 0);        
+        Joystick.button(ballJoystickButton, LOW);        
       }      
+    }
+  }
+
+  // Take care of the medium height button
+  if (mediumHeightPushButton.update()) {
+    if (mediumHeightPushButton.fallingEdge()) {
+      // toggle led
+      digitalWrite(mediumHeightLEDPin, !digitalRead(mediumHeightLEDPin));
+      // Simulate pressing Joystick buttons
+      Joystick.button(mediumHeightJoystickButton, HIGH);
+    } else if (mediumHeightPushButton.risingEdge()) {
+      Joystick.button(mediumHeightJoystickButton, LOW);
     }
   }
 }
