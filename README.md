@@ -4,10 +4,11 @@ Arduino sketch for [Teensyduino 3.5](https://www.pjrc.com/store/teensy35.html) i
 ## To Update Firmware
 1. Download and install [Arduino](https://www.arduino.cc/en/Main/Software) for your development platform
 2. Download and install [Teensyduino](https://www.pjrc.com/teensy/td_download.html) for your development platform
-3. Load 2019DSOperator2Console.ino in Arduino IDE.
-4. From the Tools menu, make sure Board/Teensyduino/Teensy 3.5 is selected.
-5. From the Tools menu, make sure USB Type/Keyboard+Mouse+Joystick is selected.
-6. Click the upload button on IDE.
+3. Clone this repo into  C:\Users\<your user>\Documents\Arduino
+4. Load 2019DSOperator2Console.ino in Arduino IDE.
+5. From the Tools menu, make sure Board/Teensyduino/Teensy 3.5 is selected.
+6. From the Tools menu, make sure USB Type/Keyboard+Mouse+Joystick is selected.
+7. Click the upload button on IDE.
 
 ## To Use
 Teensy should automatically enumerate on workstation as a HID (Human Interface Device) supporting
