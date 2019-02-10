@@ -98,8 +98,8 @@ void loop() {
   // Take care of the medium height button
   if (mediumHeightPushButton.update()) {
     if (mediumHeightPushButton.fallingEdge()) {
-      // toggle led
-      digitalWrite(mediumHeightLEDPin, !digitalRead(mediumHeightLEDPin));
+      // set LED to high always if this button is pushed
+      digitalWrite(mediumHeightLEDPin, HIGH);
       // Simulate pressing Joystick button
       Joystick.button(mediumHeightJoystickButton, HIGH);
     } else if (mediumHeightPushButton.risingEdge()) {
