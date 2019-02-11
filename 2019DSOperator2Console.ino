@@ -34,6 +34,9 @@ const int mediumHeightButtonPin = 32;
 const int ballLEDPin = 33;
 const int hatchLEDPin = 34;
 const int scoringArtifactButtonPin = 35;
+const int scoringDirectionButtonPin = 36;
+const int frontLEDPin = 37;
+const int backLEDPin = 38;
 
 // Define joystick ids for joystick HID events sent to host
 const int hatchJoystickButtonId = 1;
@@ -41,9 +44,19 @@ const int ballJoystickButtonId = 2;
 const int mediumHeightJoystickButtonId = 3;
 const int activateJoystickButtonId = 4;
 const int lowHeightJoystickButtonId = 5;
+const int frontJoystickButtonId = 6;
+const int backJoystickButtonId = 7;
 
+// Make onboard LED blink definitions
 elapsedMillis iAmAliveLastBlinked;
-int iAmAliveBlinkEveryInMs = 200;
+uint iAmAliveBlinkEveryInMs = 200;
+
+// Scoring direction selector and dependent class definitions
+TriStateSelector scoringDirectionSelector = TriStateSelector(frontLEDPin, 
+  frontJoystickButtonId, 
+  backLEDPin, 
+  backJoystickButtonId);
+Bounce scoringDirectionButtonDebouncer;
 
 // Scoring artifact selector and dependent class definitions
 TriStateSelector scoringArtifactSelector = TriStateSelector(ballLEDPin, 
@@ -74,6 +87,11 @@ Bounce activatePushButtonDebouncer;
 void setup() {
   pinMode(iAmAliveLEDPin, OUTPUT);
 
+  // Scoring direction selector setup
+  scoringDirectionButtonDebouncer.attach(scoringDirectionButtonPin, INPUT_PULLUP);
+  scoringDirectionButtonDebouncer.interval(debounceTimeInMs);
+  scoringDirectionSelector.begin(&scoringDirectionButtonDebouncer);
+  
   // Scoring artifact selector setup
   scoringArtifactButtonDebouncer.attach(scoringArtifactButtonPin, INPUT_PULLUP);
   scoringArtifactButtonDebouncer.interval(debounceTimeInMs);
@@ -101,11 +119,14 @@ void setup() {
 // This runs forever
 void loop() {
   // Update must be called periodically on all the selectors in order to pump the debouncers.
+  scoringDirectionSelector.update();
   scoringArtifactSelector.update();
   mediumHeightSelector.update();
   lowHeightSelector.update();
   activateSelector.update();
   heightSelectorGroup.update();
+  
+  // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
   if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
     iAmAliveLastBlinked = 0;
     digitalWrite(iAmAliveLEDPin, !digitalRead(iAmAliveLEDPin));    
