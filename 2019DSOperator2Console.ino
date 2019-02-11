@@ -1,4 +1,7 @@
-#include <Bounce.h>
+#include "MomentarySelector.h"
+#include "MutuallyExclusiveSelector.h"
+#include "MutuallyExclusiveSelectorGroup.h"
+#include "TriStateSelector.h"
 
 /*
  *  This is firmware for the Spartan Robotics 2019 Deepspace driver 2 operator console. 
@@ -21,101 +24,76 @@
 // Debounce settings
 const int debounceTimeInMs = 10;
 
-// Ball/Hatch pin and helper class definitions
-const int ballHatchButtonPin = 35;
+// Scoring artifact selector pin and dependent class definitions
+const int scoringArtifactButtonPin = 35;
 const int ballLEDPin = 33;
-const int ballJoystickButton = 2; 
+const int ballJoystickButtonId = 2; 
 const int hatchLEDPin = 34;
-const int hatchJoystickButton = 1;
-Bounce ballHatchPushButton = Bounce(ballHatchButtonPin, debounceTimeInMs);
+const int hatchJoystickButtonId = 1;
+TriStateSelector scoringArtifactSelector = TriStateSelector(ballLEDPin, 
+  ballJoystickButtonId, 
+  hatchLEDPin, 
+  hatchJoystickButtonId);
+Bounce scoringArtifactButtonDebouncer;
 
-// Medium height pin and helper class definitions
+// Medium height selector pin and dependent class definitions
 const int mediumHeightButtonPin = 32;
 const int mediumHeightLEDPin = 31;
-const int mediumHeightJoystickButton = 3;
-Bounce mediumHeightPushButton = Bounce(mediumHeightButtonPin, debounceTimeInMs);
+const int mediumHeightJoystickButtonId = 3;
+MutuallyExclusiveSelector mediumHeightSelector = MutuallyExclusiveSelector(mediumHeightLEDPin,
+  mediumHeightJoystickButtonId);
+Bounce mediumHeightPushButtonDebouncer;
 
-// Active pin and helper class definitions
+// Low height selector pin and dependent class definitions
+const int lowHeightButtonPin = 29;
+const int lowHeightLEDPin = 13;
+const int lowHeightJoystickButtonId = 5;
+MutuallyExclusiveSelector lowHeightSelector = MutuallyExclusiveSelector(lowHeightLEDPin,
+  lowHeightJoystickButtonId);
+Bounce lowHeightPushButtonDebouncer;
+
+// Define height selector group
+MutuallyExclusiveSelector* heightSelectors[] = {&mediumHeightSelector, &lowHeightSelector};
+MutuallyExclusiveSelectorGroup heightSelectorGroup;
+
+// Activate selector pin and dependent class definitions
 const int activateButtonPin = 30;
-const int activateJoystickButton = 4;
-Bounce activatePushButton = Bounce(activateButtonPin, debounceTimeInMs);
+const int activateJoystickButtonId = 4;
+MomentarySelector activateSelector = MomentarySelector(activateJoystickButtonId);
+Bounce activatePushButtonDebouncer;
 
 // This is run once at device startup
 void setup() {
-  // Setup pins for ball/hatch button control
-  // Note that we start out the hatch pin HIGH just
-  // for demonstration purposes, but this control is 
-  // actually a tri-state control - Ball, Hatch, or nothing,
-  // so this should probably change to make none of these LEDs
-  // on at startup.
-  pinMode(ballLEDPin, OUTPUT);
-  pinMode(hatchLEDPin, OUTPUT);
-  pinMode(ballHatchButtonPin, INPUT_PULLUP);      // Note that this makes the UNPRESSED state HIGH.
-  digitalWrite(hatchLEDPin, LOW);
-  digitalWrite(ballLEDPin, LOW);
+  // Scoring artifact selector setup
+  scoringArtifactButtonDebouncer.attach(scoringArtifactButtonPin, INPUT_PULLUP);
+  scoringArtifactButtonDebouncer.interval(debounceTimeInMs);
+  scoringArtifactSelector.begin(&scoringArtifactButtonDebouncer);
 
-  // Setup pins for medium height control
-  pinMode(mediumHeightLEDPin, OUTPUT);
-  pinMode(mediumHeightButtonPin, INPUT_PULLUP);   // Note that this makes the UNPRESSED state HIGH.
-  digitalWrite(mediumHeightLEDPin, LOW);          // The default is low, but this is good form.
+  // Medium height selector setup
+  mediumHeightPushButtonDebouncer.attach(mediumHeightButtonPin, INPUT_PULLUP);
+  mediumHeightPushButtonDebouncer.interval(debounceTimeInMs);
+  mediumHeightSelector.begin(&mediumHeightPushButtonDebouncer);
 
-  // Setup pins for activate control
-  pinMode(activateButtonPin, INPUT_PULLUP);
+  // Low height selector setup
+  lowHeightPushButtonDebouncer.attach(lowHeightButtonPin, INPUT_PULLUP);
+  lowHeightPushButtonDebouncer.interval(debounceTimeInMs);
+  lowHeightSelector.begin(&lowHeightPushButtonDebouncer);
+
+  // Activate selector setup
+  activatePushButtonDebouncer.attach(activateButtonPin, INPUT_PULLUP);
+  activatePushButtonDebouncer.interval(debounceTimeInMs);
+  activateSelector.begin(&activatePushButtonDebouncer);
+
+  // Height selector group setup (for radio-button like control)
+  heightSelectorGroup.begin(heightSelectors, 2);
 }
 
 // This runs forever
 void loop() {
-  
-  // Take care of the ball/hatch button
-  if (ballHatchPushButton.update()) {
-    if (ballHatchPushButton.fallingEdge()) {
-      // Ball was the first LED on the whiteboard, so if we are in the
-      // 'None' state, then make the ball LED turn on.
-      if (digitalRead(hatchLEDPin) == LOW && digitalRead(ballLEDPin) == LOW) {
-        digitalWrite(ballLEDPin, HIGH);
-      } else {
-        // toggle leds
-        digitalWrite(hatchLEDPin, !digitalRead(hatchLEDPin));
-        digitalWrite(ballLEDPin, !digitalRead(ballLEDPin));
-      }
-      
-      // Simulate pressing Joystick buttons
-      if (digitalRead(hatchLEDPin)) {
-        Joystick.button(hatchJoystickButton, HIGH);
-      } else if (digitalRead(ballLEDPin)) {
-        Joystick.button(ballJoystickButton, HIGH);
-      }
-    } else if (ballHatchPushButton.risingEdge()) {
-      // Simulate releasing Joystick buttons
-      if (digitalRead(hatchLEDPin)) {
-        Joystick.button(hatchJoystickButton, LOW);
-      } else if (digitalRead(ballLEDPin)) {
-        Joystick.button(ballJoystickButton, LOW);        
-      }      
-    }
-  }
-
-  // Take care of the medium height button
-  if (mediumHeightPushButton.update()) {
-    if (mediumHeightPushButton.fallingEdge()) {
-      // set LED to high always if this button is pushed
-      digitalWrite(mediumHeightLEDPin, HIGH);
-      // Simulate pressing Joystick button
-      Joystick.button(mediumHeightJoystickButton, HIGH);
-    } else if (mediumHeightPushButton.risingEdge()) {
-      // Simulate releasing Joystick button
-      Joystick.button(mediumHeightJoystickButton, LOW);
-    }
-  }
-
-  // Take care of the activate button
-  if (activatePushButton.update()) {
-    if (activatePushButton.fallingEdge()) {
-      // Simulate pressing Joystick button
-      Joystick.button(activateJoystickButton, HIGH);
-    } else if (activatePushButton.risingEdge()) {
-      // Simulate pressing Joystick button
-      Joystick.button(activateJoystickButton, LOW);      
-    }
-  }
+  // Update must be called periodically on all the selectors in order to pump the debouncers.
+  scoringArtifactSelector.update();
+  mediumHeightSelector.update();
+  lowHeightSelector.update();
+  activateSelector.update();
+  heightSelectorGroup.update();
 }
