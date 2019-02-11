@@ -26,6 +26,14 @@ const int debounceTimeInMs = 10;
 
 // Define Teensy pins
 const int iAmAliveLEDPin = 13;
+const int AButtonPin = 14;
+const int BButtonPin = 15;
+const int XButtonPin = 16;
+const int leftButtonPin = 17;
+const int centerButtonPin = 18;
+const int rightButtonPin = 19;
+const int intakeLEDPin = 20;
+const int intakeButtonPin = 21;
 const int cancelButtonPin = 22;
 const int highHeightLEDPin = 23;
 const int highHeightButtonPin = 24;
@@ -56,6 +64,13 @@ const int rocketJoystickButtonId = 8;
 const int cargoShipJoystickButtonId = 9;
 const int highHeightJoystickButtonId = 10;
 const int cancelJoystickButtonId = 11;
+const int intakeJoystickButtonId = 12;
+const int AJoystickButtonId = 13;
+const int BJoystickButtonId = 14;
+const int XJoystickButtonId = 15;
+const int leftJoystickHatAngle = 315;
+const int centerJoystickHatAngle = 0;
+const int rightJoystickHatAngle = 45;
 
 // Make onboard LED blink definitions
 elapsedMillis iAmAliveLastBlinked;
