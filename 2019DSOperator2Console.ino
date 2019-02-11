@@ -26,6 +26,8 @@ const int debounceTimeInMs = 10;
 
 // Define Teensy pins
 const int iAmAliveLEDPin = 13;
+const int highHeightLEDPin = 23;
+const int highHeightButtonPin = 24;
 const int scoringDestinationButtonPin = 25;
 const int cargoShipLEDPin = 26;
 const int rocketLEDPin = 27;
@@ -51,6 +53,7 @@ const int frontJoystickButtonId = 6;
 const int backJoystickButtonId = 7;
 const int rocketJoystickButtonId = 8;
 const int cargoShipJoystickButtonId = 9;
+const int highHeightJoystickButtonId = 10;
 
 // Make onboard LED blink definitions
 elapsedMillis iAmAliveLastBlinked;
@@ -76,6 +79,11 @@ TriStateSelector scoringDestinationSelector = TriStateSelector(rocketLEDPin,
   cargoShipLEDPin, 
   cargoShipJoystickButtonId);
 Bounce scoringDestinationButtonDebouncer;
+
+// High height selector and dependent class definitions
+MutuallyExclusiveSelector highHeightSelector = MutuallyExclusiveSelector(highHeightLEDPin,
+  highHeightJoystickButtonId);
+Bounce highHeightPushButtonDebouncer;
 
 // Medium height selector and dependent class definitions
 MutuallyExclusiveSelector mediumHeightSelector = MutuallyExclusiveSelector(mediumHeightLEDPin,
@@ -119,6 +127,11 @@ void setup() {
   activatePushButtonDebouncer.interval(debounceTimeInMs);
   activateSelector.begin(&activatePushButtonDebouncer);
 
+  // High height selector setup
+  highHeightPushButtonDebouncer.attach(highHeightButtonPin, INPUT_PULLUP);
+  highHeightPushButtonDebouncer.interval(debounceTimeInMs);
+  highHeightSelector.begin(&highHeightPushButtonDebouncer);
+
   // Medium height selector setup
   mediumHeightPushButtonDebouncer.attach(mediumHeightButtonPin, INPUT_PULLUP);
   mediumHeightPushButtonDebouncer.interval(debounceTimeInMs);
@@ -138,9 +151,11 @@ void loop() {
   // Update must be called periodically on all the selectors in order to pump the debouncers.
   scoringDirectionSelector.update();
   scoringArtifactSelector.update();
+  scoringDestinationSelector.update();
+  activateSelector.update();
+  highHeightSelector.update();
   mediumHeightSelector.update();
   lowHeightSelector.update();
-  activateSelector.update();
   heightSelectorGroup.update();
   
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
