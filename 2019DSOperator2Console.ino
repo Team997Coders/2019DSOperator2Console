@@ -26,6 +26,7 @@ const int debounceTimeInMs = 10;
 
 // Define Teensy pins
 const int iAmAliveLEDPin = 13;
+const int cancelButtonPin = 22;
 const int highHeightLEDPin = 23;
 const int highHeightButtonPin = 24;
 const int scoringDestinationButtonPin = 25;
@@ -54,6 +55,7 @@ const int backJoystickButtonId = 7;
 const int rocketJoystickButtonId = 8;
 const int cargoShipJoystickButtonId = 9;
 const int highHeightJoystickButtonId = 10;
+const int cancelJoystickButtonId = 11;
 
 // Make onboard LED blink definitions
 elapsedMillis iAmAliveLastBlinked;
@@ -80,6 +82,10 @@ TriStateSelector scoringDestinationSelector = TriStateSelector(rocketLEDPin,
   cargoShipJoystickButtonId);
 Bounce scoringDestinationButtonDebouncer;
 
+// Activate selector and dependent class definitions
+MomentarySelector activateSelector = MomentarySelector(activateJoystickButtonId);
+Bounce activatePushButtonDebouncer;
+
 // High height selector and dependent class definitions
 MutuallyExclusiveSelector highHeightSelector = MutuallyExclusiveSelector(highHeightLEDPin,
   highHeightJoystickButtonId);
@@ -99,9 +105,9 @@ Bounce lowHeightPushButtonDebouncer;
 MutuallyExclusiveSelector* heightSelectors[] = {&mediumHeightSelector, &lowHeightSelector};
 MutuallyExclusiveSelectorGroup heightSelectorGroup;
 
-// Activate selector and dependent class definitions
-MomentarySelector activateSelector = MomentarySelector(activateJoystickButtonId);
-Bounce activatePushButtonDebouncer;
+// Cancel selector and dependent class definitions
+MomentarySelector cancelSelector = MomentarySelector(cancelJoystickButtonId);
+Bounce cancelPushButtonDebouncer;
 
 // This is run once at device startup
 void setup() {
@@ -144,6 +150,11 @@ void setup() {
 
   // Height selector group setup (for radio-button like control)
   heightSelectorGroup.begin(heightSelectors, 2);
+
+  // Cancel selector setup
+  cancelPushButtonDebouncer.attach(cancelButtonPin, INPUT_PULLUP);
+  cancelPushButtonDebouncer.interval(debounceTimeInMs);
+  cancelSelector.begin(&cancelPushButtonDebouncer);
 }
 
 // This runs forever
@@ -157,6 +168,7 @@ void loop() {
   mediumHeightSelector.update();
   lowHeightSelector.update();
   heightSelectorGroup.update();
+  cancelSelector.update();
   
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
   if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
