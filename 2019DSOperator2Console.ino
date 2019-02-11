@@ -24,30 +24,40 @@
 // Debounce settings
 const int debounceTimeInMs = 10;
 
-// Scoring artifact selector pin and dependent class definitions
-const int scoringArtifactButtonPin = 35;
+// Define Teensy pins
+const int iAmAliveLEDPin = 13;
+const int lowHeightLEDPin = 28;
+const int lowHeightButtonPin = 29;
+const int activateButtonPin = 30;
+const int mediumHeightLEDPin = 31;
+const int mediumHeightButtonPin = 32;
 const int ballLEDPin = 33;
-const int ballJoystickButtonId = 2; 
 const int hatchLEDPin = 34;
+const int scoringArtifactButtonPin = 35;
+
+// Define joystick ids for joystick HID events sent to host
 const int hatchJoystickButtonId = 1;
+const int ballJoystickButtonId = 2; 
+const int mediumHeightJoystickButtonId = 3;
+const int activateJoystickButtonId = 4;
+const int lowHeightJoystickButtonId = 5;
+
+elapsedMillis iAmAliveLastBlinked;
+int iAmAliveBlinkEveryInMs = 200;
+
+// Scoring artifact selector and dependent class definitions
 TriStateSelector scoringArtifactSelector = TriStateSelector(ballLEDPin, 
   ballJoystickButtonId, 
   hatchLEDPin, 
   hatchJoystickButtonId);
 Bounce scoringArtifactButtonDebouncer;
 
-// Medium height selector pin and dependent class definitions
-const int mediumHeightButtonPin = 32;
-const int mediumHeightLEDPin = 31;
-const int mediumHeightJoystickButtonId = 3;
+// Medium height selector and dependent class definitions
 MutuallyExclusiveSelector mediumHeightSelector = MutuallyExclusiveSelector(mediumHeightLEDPin,
   mediumHeightJoystickButtonId);
 Bounce mediumHeightPushButtonDebouncer;
 
-// Low height selector pin and dependent class definitions
-const int lowHeightButtonPin = 29;
-const int lowHeightLEDPin = 13;
-const int lowHeightJoystickButtonId = 5;
+// Low height selector and dependent class definitions
 MutuallyExclusiveSelector lowHeightSelector = MutuallyExclusiveSelector(lowHeightLEDPin,
   lowHeightJoystickButtonId);
 Bounce lowHeightPushButtonDebouncer;
@@ -56,14 +66,14 @@ Bounce lowHeightPushButtonDebouncer;
 MutuallyExclusiveSelector* heightSelectors[] = {&mediumHeightSelector, &lowHeightSelector};
 MutuallyExclusiveSelectorGroup heightSelectorGroup;
 
-// Activate selector pin and dependent class definitions
-const int activateButtonPin = 30;
-const int activateJoystickButtonId = 4;
+// Activate selector and dependent class definitions
 MomentarySelector activateSelector = MomentarySelector(activateJoystickButtonId);
 Bounce activatePushButtonDebouncer;
 
 // This is run once at device startup
 void setup() {
+  pinMode(iAmAliveLEDPin, OUTPUT);
+
   // Scoring artifact selector setup
   scoringArtifactButtonDebouncer.attach(scoringArtifactButtonPin, INPUT_PULLUP);
   scoringArtifactButtonDebouncer.interval(debounceTimeInMs);
@@ -96,4 +106,8 @@ void loop() {
   lowHeightSelector.update();
   activateSelector.update();
   heightSelectorGroup.update();
+  if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
+    iAmAliveLastBlinked = 0;
+    digitalWrite(iAmAliveLEDPin, !digitalRead(iAmAliveLEDPin));    
+  }
 }
