@@ -26,6 +26,9 @@ const int debounceTimeInMs = 10;
 
 // Define Teensy pins
 const int iAmAliveLEDPin = 13;
+const int scoringDestinationButtonPin = 25;
+const int cargoShipLEDPin = 26;
+const int rocketLEDPin = 27;
 const int lowHeightLEDPin = 28;
 const int lowHeightButtonPin = 29;
 const int activateButtonPin = 30;
@@ -46,6 +49,8 @@ const int activateJoystickButtonId = 4;
 const int lowHeightJoystickButtonId = 5;
 const int frontJoystickButtonId = 6;
 const int backJoystickButtonId = 7;
+const int rocketJoystickButtonId = 8;
+const int cargoShipJoystickButtonId = 9;
 
 // Make onboard LED blink definitions
 elapsedMillis iAmAliveLastBlinked;
@@ -64,6 +69,13 @@ TriStateSelector scoringArtifactSelector = TriStateSelector(ballLEDPin,
   hatchLEDPin, 
   hatchJoystickButtonId);
 Bounce scoringArtifactButtonDebouncer;
+
+// Scoring destination selector and dependent class definitions
+TriStateSelector scoringDestinationSelector = TriStateSelector(rocketLEDPin, 
+  rocketJoystickButtonId, 
+  cargoShipLEDPin, 
+  cargoShipJoystickButtonId);
+Bounce scoringDestinationButtonDebouncer;
 
 // Medium height selector and dependent class definitions
 MutuallyExclusiveSelector mediumHeightSelector = MutuallyExclusiveSelector(mediumHeightLEDPin,
@@ -97,6 +109,16 @@ void setup() {
   scoringArtifactButtonDebouncer.interval(debounceTimeInMs);
   scoringArtifactSelector.begin(&scoringArtifactButtonDebouncer);
 
+  // Scoring destination selector setup
+  scoringDestinationButtonDebouncer.attach(scoringDestinationButtonPin, INPUT_PULLUP);
+  scoringDestinationButtonDebouncer.interval(debounceTimeInMs);
+  scoringDestinationSelector.begin(&scoringDestinationButtonDebouncer);
+
+  // Activate selector setup
+  activatePushButtonDebouncer.attach(activateButtonPin, INPUT_PULLUP);
+  activatePushButtonDebouncer.interval(debounceTimeInMs);
+  activateSelector.begin(&activatePushButtonDebouncer);
+
   // Medium height selector setup
   mediumHeightPushButtonDebouncer.attach(mediumHeightButtonPin, INPUT_PULLUP);
   mediumHeightPushButtonDebouncer.interval(debounceTimeInMs);
@@ -106,11 +128,6 @@ void setup() {
   lowHeightPushButtonDebouncer.attach(lowHeightButtonPin, INPUT_PULLUP);
   lowHeightPushButtonDebouncer.interval(debounceTimeInMs);
   lowHeightSelector.begin(&lowHeightPushButtonDebouncer);
-
-  // Activate selector setup
-  activatePushButtonDebouncer.attach(activateButtonPin, INPUT_PULLUP);
-  activatePushButtonDebouncer.interval(debounceTimeInMs);
-  activateSelector.begin(&activatePushButtonDebouncer);
 
   // Height selector group setup (for radio-button like control)
   heightSelectorGroup.begin(heightSelectors, 2);
