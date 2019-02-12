@@ -2,17 +2,13 @@
 #define H_MUTUALLYEXCLUSIVESELECTOR
 
 #include <Bounce2.h>
+#include "Selector.h"
 
-typedef bool (* function_pointer_t) ();
-
-class MutuallyExclusiveSelector {
+class MutuallyExclusiveSelector: public Selector {
   // Declare class member variables initialied via constructor
   int ledPin;
   int joystickButtonId;
-  bool clickedFlag;
-  // Must return a bool indicating whether validation succeeded
-  function_pointer_t isValid;
-
+  
   // Declare working member variables
   Bounce* buttonDebouncer;
   
@@ -20,12 +16,9 @@ class MutuallyExclusiveSelector {
   MutuallyExclusiveSelector(int ledPin,
     int joystickButtonId
   );
-  void update();
   void begin(Bounce* buttonDebouncer);
   void off();
-  bool clicked();
-  void setValidator(function_pointer_t validatorCallback);
-  bool canValidate();
+  void update();
 };
 
 #endif // H_MUTUALLYEXCLUSIVESELECTOR

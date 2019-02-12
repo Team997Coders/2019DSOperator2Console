@@ -1,14 +1,12 @@
 #include <Arduino.h>
 #include "MutuallyExclusiveSelector.h"
 
-// Constructor
+// Constructor and call the selector constructor as well
 MutuallyExclusiveSelector::MutuallyExclusiveSelector(int ledPin,
-    int joystickButtonId) {
+    int joystickButtonId): Selector() {
   // Initialize member variables
   this->ledPin = ledPin;
   this->joystickButtonId = joystickButtonId;
-  this->clickedFlag = false;
-  this->isValid = NULL;
 }
 
 // Must call in setup to wire up pins and debouncer
@@ -44,19 +42,7 @@ void MutuallyExclusiveSelector::update() {
   }  
 }
 
+// Turn the state off by offing LED
 void MutuallyExclusiveSelector::off() {
   digitalWrite(ledPin, LOW);
 }
-
-bool MutuallyExclusiveSelector::clicked() {
-  return clickedFlag;
-}
-
-void MutuallyExclusiveSelector::setValidator(function_pointer_t validatorCallback) {
-  isValid = validatorCallback;
-}
-
-bool MutuallyExclusiveSelector::canValidate() {
-  return !(isValid == NULL);
-}
-
