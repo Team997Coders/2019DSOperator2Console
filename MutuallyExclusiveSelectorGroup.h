@@ -13,6 +13,7 @@ class MutuallyExclusiveSelectorGroup {
   public:
   MutuallyExclusiveSelectorGroup();
   void allOthersOff(MutuallyExclusiveSelector* selector);
+  void allOff();
   void begin(MutuallyExclusiveSelector** selectors, size_t selectorsCount);
   void update();
 };

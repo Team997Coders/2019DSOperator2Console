@@ -30,3 +30,12 @@ void MutuallyExclusiveSelectorGroup::update() {
     }
   }  
 }
+
+// Call turn all other selectors off
+void MutuallyExclusiveSelectorGroup::allOff() {
+  // Loop over all selectors turning off all but the one passed in.
+  for( uint i = 0; i < selectorsCount; i++) {
+    selectors[i]->off();
+  }
+}
+

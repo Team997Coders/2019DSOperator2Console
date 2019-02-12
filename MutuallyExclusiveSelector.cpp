@@ -8,6 +8,7 @@ MutuallyExclusiveSelector::MutuallyExclusiveSelector(int ledPin,
   this->ledPin = ledPin;
   this->joystickButtonId = joystickButtonId;
   this->clickedFlag = false;
+  this->isValid = NULL;
 }
 
 // Must call in setup to wire up pins and debouncer
@@ -27,14 +28,18 @@ void MutuallyExclusiveSelector::update() {
   // Take care of the selector button
   if (buttonDebouncer->update()) {
     if (buttonDebouncer->fallingEdge()) {
-      // set LED to high always if this button is pushed
-      digitalWrite(ledPin, HIGH);
-      // Simulate pressing Joystick button
-      Joystick.button(joystickButtonId, HIGH);
+      if (canValidate() && isValid()) {
+        // set LED to high always if this button is pushed
+        digitalWrite(ledPin, HIGH);
+        // Simulate pressing Joystick button
+        Joystick.button(joystickButtonId, HIGH);
+      }
     } else if (buttonDebouncer->risingEdge()) {
-      // Simulate releasing Joystick button
-      Joystick.button(joystickButtonId, LOW);
-      clickedFlag = true;
+      if (canValidate() && isValid()) {
+        // Simulate releasing Joystick button
+        Joystick.button(joystickButtonId, LOW);
+        clickedFlag = true;
+      }
     }
   }  
 }
@@ -46,3 +51,12 @@ void MutuallyExclusiveSelector::off() {
 bool MutuallyExclusiveSelector::clicked() {
   return clickedFlag;
 }
+
+void MutuallyExclusiveSelector::setValidator(function_pointer_t validatorCallback) {
+  isValid = validatorCallback;
+}
+
+bool MutuallyExclusiveSelector::canValidate() {
+  return !(isValid == NULL);
+}
+

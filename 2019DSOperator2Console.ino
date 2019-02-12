@@ -154,6 +154,15 @@ Bounce centerPushButtonDebouncer;
 MomentarySelectorPOV rightSelector = MomentarySelectorPOV(rightJoystickHatAngle);
 Bounce rightPushButtonDebouncer;
 
+// Returns true if height selectors can be set
+bool heightValidator() {
+  if (digitalRead(cargoShipLEDPin)) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 // This is run once at device startup
 void setup() {
   pinMode(iAmAliveLEDPin, OUTPUT);
@@ -182,16 +191,19 @@ void setup() {
   highHeightPushButtonDebouncer.attach(highHeightButtonPin, INPUT_PULLUP);
   highHeightPushButtonDebouncer.interval(debounceTimeInMs);
   highHeightSelector.begin(&highHeightPushButtonDebouncer);
+  highHeightSelector.setValidator(heightValidator);
 
   // Medium height selector setup
   mediumHeightPushButtonDebouncer.attach(mediumHeightButtonPin, INPUT_PULLUP);
   mediumHeightPushButtonDebouncer.interval(debounceTimeInMs);
   mediumHeightSelector.begin(&mediumHeightPushButtonDebouncer);
+  mediumHeightSelector.setValidator(heightValidator);
 
   // Low height selector setup
   lowHeightPushButtonDebouncer.attach(lowHeightButtonPin, INPUT_PULLUP);
   lowHeightPushButtonDebouncer.interval(debounceTimeInMs);
   lowHeightSelector.begin(&lowHeightPushButtonDebouncer);
+  lowHeightSelector.setValidator(heightValidator);
 
   // Height selector group setup (for radio-button like control)
   heightSelectorGroup.begin(heightSelectors, 3);
@@ -256,6 +268,12 @@ void loop() {
   leftSelector.update();
   centerSelector.update();
   rightSelector.update();
+
+  // Scoring on cargo ship has no height setting, so clear the height selector group
+  // if the cargo ship led is lit.
+  if (digitalRead(cargoShipLEDPin)) {
+    heightSelectorGroup.allOff();
+  }
   
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
   if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
