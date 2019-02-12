@@ -129,6 +129,14 @@ Bounce cancelPushButtonDebouncer;
 ToggleSelector intakeSelector = ToggleSelector(intakeLEDPin, intakeJoystickButtonId);
 Bounce intakePushButtonDebouncer;
 
+// A selector and dependent class definitions
+MomentarySelector ASelector = MomentarySelector(AJoystickButtonId);
+Bounce APushButtonDebouncer;
+
+// B selector and dependent class definitions
+MomentarySelector BSelector = MomentarySelector(BJoystickButtonId);
+Bounce BPushButtonDebouncer;
+
 // This is run once at device startup
 void setup() {
   pinMode(iAmAliveLEDPin, OUTPUT);
@@ -180,6 +188,16 @@ void setup() {
   intakePushButtonDebouncer.attach(intakeButtonPin, INPUT_PULLUP);
   intakePushButtonDebouncer.interval(debounceTimeInMs);
   intakeSelector.begin(&intakePushButtonDebouncer);
+
+  // A selector setup
+  APushButtonDebouncer.attach(AButtonPin, INPUT_PULLUP);
+  APushButtonDebouncer.interval(debounceTimeInMs);
+  ASelector.begin(&APushButtonDebouncer);
+
+  // B selector setup
+  BPushButtonDebouncer.attach(BButtonPin, INPUT_PULLUP);
+  BPushButtonDebouncer.interval(debounceTimeInMs);
+  BSelector.begin(&BPushButtonDebouncer);
 }
 
 // This runs forever
@@ -195,6 +213,8 @@ void loop() {
   heightSelectorGroup.update();
   cancelSelector.update();
   intakeSelector.update();
+  ASelector.update();
+  BSelector.update();
   
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
   if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
