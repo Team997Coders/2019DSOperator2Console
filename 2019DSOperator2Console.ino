@@ -137,6 +137,10 @@ Bounce APushButtonDebouncer;
 MomentarySelector BSelector = MomentarySelector(BJoystickButtonId);
 Bounce BPushButtonDebouncer;
 
+// X selector and dependent class definitions
+MomentarySelector XSelector = MomentarySelector(XJoystickButtonId);
+Bounce XPushButtonDebouncer;
+
 // This is run once at device startup
 void setup() {
   pinMode(iAmAliveLEDPin, OUTPUT);
@@ -198,6 +202,11 @@ void setup() {
   BPushButtonDebouncer.attach(BButtonPin, INPUT_PULLUP);
   BPushButtonDebouncer.interval(debounceTimeInMs);
   BSelector.begin(&BPushButtonDebouncer);
+
+  // X selector setup
+  XPushButtonDebouncer.attach(XButtonPin, INPUT_PULLUP);
+  XPushButtonDebouncer.interval(debounceTimeInMs);
+  XSelector.begin(&XPushButtonDebouncer);
 }
 
 // This runs forever
@@ -215,6 +224,7 @@ void loop() {
   intakeSelector.update();
   ASelector.update();
   BSelector.update();
+  XSelector.update();
   
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
   if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
