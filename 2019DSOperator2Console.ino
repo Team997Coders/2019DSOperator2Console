@@ -119,7 +119,7 @@ MutuallyExclusiveSelector lowHeightSelector = MutuallyExclusiveSelector(lowHeigh
 Bounce lowHeightPushButtonDebouncer;
 
 // Define height selector group
-MutuallyExclusiveSelector* heightSelectors[] = {&mediumHeightSelector, &lowHeightSelector};
+MutuallyExclusiveSelector* heightSelectors[] = {&highHeightSelector, &mediumHeightSelector, &lowHeightSelector};
 MutuallyExclusiveSelectorGroup heightSelectorGroup;
 
 // Cancel selector and dependent class definitions
@@ -194,7 +194,7 @@ void setup() {
   lowHeightSelector.begin(&lowHeightPushButtonDebouncer);
 
   // Height selector group setup (for radio-button like control)
-  heightSelectorGroup.begin(heightSelectors, 2);
+  heightSelectorGroup.begin(heightSelectors, 3);
 
   // Cancel selector setup
   cancelPushButtonDebouncer.attach(cancelButtonPin, INPUT_PULLUP);
