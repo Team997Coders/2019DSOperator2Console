@@ -1,4 +1,5 @@
 #include "MomentarySelector.h"
+#include "MomentarySelectorPOV.h"
 #include "MutuallyExclusiveSelector.h"
 #include "MutuallyExclusiveSelectorGroup.h"
 #include "ToggleSelector.h"
@@ -141,6 +142,18 @@ Bounce BPushButtonDebouncer;
 MomentarySelector XSelector = MomentarySelector(XJoystickButtonId);
 Bounce XPushButtonDebouncer;
 
+// Left selector and dependent class definitions
+MomentarySelectorPOV leftSelector = MomentarySelectorPOV(leftJoystickHatAngle);
+Bounce leftPushButtonDebouncer;
+
+// Center selector and dependent class definitions
+MomentarySelectorPOV centerSelector = MomentarySelectorPOV(centerJoystickHatAngle);
+Bounce centerPushButtonDebouncer;
+
+// Center selector and dependent class definitions
+MomentarySelectorPOV rightSelector = MomentarySelectorPOV(rightJoystickHatAngle);
+Bounce rightPushButtonDebouncer;
+
 // This is run once at device startup
 void setup() {
   pinMode(iAmAliveLEDPin, OUTPUT);
@@ -207,6 +220,21 @@ void setup() {
   XPushButtonDebouncer.attach(XButtonPin, INPUT_PULLUP);
   XPushButtonDebouncer.interval(debounceTimeInMs);
   XSelector.begin(&XPushButtonDebouncer);
+
+  // Left selector setup
+  leftPushButtonDebouncer.attach(leftButtonPin, INPUT_PULLUP);
+  leftPushButtonDebouncer.interval(debounceTimeInMs);
+  leftSelector.begin(&leftPushButtonDebouncer);
+
+  // Center selector setup
+  centerPushButtonDebouncer.attach(centerButtonPin, INPUT_PULLUP);
+  centerPushButtonDebouncer.interval(debounceTimeInMs);
+  centerSelector.begin(&centerPushButtonDebouncer);
+
+  // Right selector setup
+  rightPushButtonDebouncer.attach(rightButtonPin, INPUT_PULLUP);
+  rightPushButtonDebouncer.interval(debounceTimeInMs);
+  rightSelector.begin(&rightPushButtonDebouncer);
 }
 
 // This runs forever
@@ -225,6 +253,9 @@ void loop() {
   ASelector.update();
   BSelector.update();
   XSelector.update();
+  leftSelector.update();
+  centerSelector.update();
+  rightSelector.update();
   
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
   if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
