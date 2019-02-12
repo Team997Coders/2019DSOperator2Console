@@ -1,6 +1,7 @@
 #include "MomentarySelector.h"
 #include "MutuallyExclusiveSelector.h"
 #include "MutuallyExclusiveSelectorGroup.h"
+#include "ToggleSelector.h"
 #include "TriStateSelector.h"
 
 /*
@@ -124,6 +125,10 @@ MutuallyExclusiveSelectorGroup heightSelectorGroup;
 MomentarySelector cancelSelector = MomentarySelector(cancelJoystickButtonId);
 Bounce cancelPushButtonDebouncer;
 
+// Intake selector and dependent class definitions
+ToggleSelector intakeSelector = ToggleSelector(intakeLEDPin, intakeJoystickButtonId);
+Bounce intakePushButtonDebouncer;
+
 // This is run once at device startup
 void setup() {
   pinMode(iAmAliveLEDPin, OUTPUT);
@@ -170,6 +175,11 @@ void setup() {
   cancelPushButtonDebouncer.attach(cancelButtonPin, INPUT_PULLUP);
   cancelPushButtonDebouncer.interval(debounceTimeInMs);
   cancelSelector.begin(&cancelPushButtonDebouncer);
+
+  // Intake selector setup
+  intakePushButtonDebouncer.attach(intakeButtonPin, INPUT_PULLUP);
+  intakePushButtonDebouncer.interval(debounceTimeInMs);
+  intakeSelector.begin(&intakePushButtonDebouncer);
 }
 
 // This runs forever
@@ -184,6 +194,7 @@ void loop() {
   lowHeightSelector.update();
   heightSelectorGroup.update();
   cancelSelector.update();
+  intakeSelector.update();
   
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
   if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
