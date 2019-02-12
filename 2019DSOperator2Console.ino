@@ -150,7 +150,7 @@ Bounce leftPushButtonDebouncer;
 MomentarySelectorPOV centerSelector = MomentarySelectorPOV(centerJoystickHatAngle);
 Bounce centerPushButtonDebouncer;
 
-// Center selector and dependent class definitions
+// Right selector and dependent class definitions
 MomentarySelectorPOV rightSelector = MomentarySelectorPOV(rightJoystickHatAngle);
 Bounce rightPushButtonDebouncer;
 
