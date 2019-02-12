@@ -2,7 +2,7 @@
 #include "MomentarySelectorPOV.h"
 
 // Constructor
-MomentarySelectorPOV::MomentarySelectorPOV(int joystickHatAngle) {
+MomentarySelectorPOV::MomentarySelectorPOV(int joystickHatAngle): Selector() {
   // Initialize member variables
   this->joystickHatAngle = joystickHatAngle;
 }
@@ -14,13 +14,18 @@ void MomentarySelectorPOV::begin(Bounce* buttonDebouncer) {
 
 // Call this function every loop to poll debouncer
 void MomentarySelectorPOV::update() {
+  clickedFlag = false;
   // Take care of the selector button
   if (buttonDebouncer->update()) {
     if (buttonDebouncer->fallingEdge()) {
-      // Simulate settings POV to angle
-      Joystick.hat(joystickHatAngle);
+      if (canValidate() && isValid()) {
+        // Simulate settings POV to angle
+        Joystick.hat(joystickHatAngle);
+      }
     } else if (buttonDebouncer->risingEdge()) {
-      // Nothing to do
+      if (canValidate() && isValid()) {
+        clickedFlag = true;
+      }
     }
   }  
 }

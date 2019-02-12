@@ -2,8 +2,9 @@
 #define H_MOMENTARYSELECTOR
 
 #include <Bounce2.h>
+#include "Selector.h"
 
-class MomentarySelector {
+class MomentarySelector: public Selector {
   // Declare class member variables initialied via constructor
   int joystickButtonId; 
 
@@ -12,8 +13,8 @@ class MomentarySelector {
   
   public:
   MomentarySelector(int joystickButtonId);
-  void update();
   void begin(Bounce* buttonDebouncer);
+  void update();
 };
 
 #endif // H_MOMENTARYSELECTOR

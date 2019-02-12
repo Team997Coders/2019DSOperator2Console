@@ -2,7 +2,7 @@
 #include "MomentarySelector.h"
 
 // Constructor
-MomentarySelector::MomentarySelector(int joystickButtonId) {
+MomentarySelector::MomentarySelector(int joystickButtonId): Selector() {
   // Initialize member variables
   this->joystickButtonId = joystickButtonId;
 }
@@ -14,14 +14,20 @@ void MomentarySelector::begin(Bounce* buttonDebouncer) {
 
 // Call this function every loop to poll debouncer
 void MomentarySelector::update() {
+  clickedFlag = false;
   // Take care of the selector button
   if (buttonDebouncer->update()) {
     if (buttonDebouncer->fallingEdge()) {
-      // Simulate pressing Joystick button
-      Joystick.button(joystickButtonId, HIGH);
+      if (canValidate() && isValid()) {
+        // Simulate pressing Joystick button
+        Joystick.button(joystickButtonId, HIGH);
+      }
     } else if (buttonDebouncer->risingEdge()) {
-      // Simulate releasing Joystick button
-      Joystick.button(joystickButtonId, LOW);
+      if (canValidate() && isValid()) {
+        // Simulate releasing Joystick button
+        Joystick.button(joystickButtonId, LOW);
+        clickedFlag = true;
+      }
     }
   }  
 }

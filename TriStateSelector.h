@@ -2,8 +2,9 @@
 #define H_TRISTATESELECTOR
 
 #include <Bounce2.h>
+#include "Selector.h"
 
-class TriStateSelector {
+class TriStateSelector: public Selector {
   // Declare class member variables initialied via constructor
   int leftLEDPin;
   int leftJoystickButtonId; 

@@ -155,8 +155,22 @@ MomentarySelectorPOV rightSelector = MomentarySelectorPOV(rightJoystickHatAngle)
 Bounce rightPushButtonDebouncer;
 
 // Returns true if height selectors can be set
+// Height settings are not applicable when scoring
+// on the cargo ship.
 bool heightValidator() {
   if (digitalRead(cargoShipLEDPin)) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+// Back/Hatch/Rocket is an invalid combination
+bool destinationValidator() {
+  // Note that this method will get called when we are attempting
+  // to transition FROM cargo ship TO rocket, so thus why we
+  // are looking for cargo ship to be true
+  if (digitalRead(backLEDPin) && digitalRead(hatchLEDPin) && digitalRead(cargoShipLEDPin)) {
     return false;
   } else {
     return true;
@@ -181,6 +195,7 @@ void setup() {
   scoringDestinationButtonDebouncer.attach(scoringDestinationButtonPin, INPUT_PULLUP);
   scoringDestinationButtonDebouncer.interval(debounceTimeInMs);
   scoringDestinationSelector.begin(&scoringDestinationButtonDebouncer);
+  scoringDestinationSelector.setValidator(destinationValidator);
 
   // Activate selector setup
   activatePushButtonDebouncer.attach(activateButtonPin, INPUT_PULLUP);
@@ -274,6 +289,24 @@ void loop() {
   // if the cargo ship led is lit.
   if (digitalRead(cargoShipLEDPin)) {
     heightSelectorGroup.allOff();
+  }
+
+  // TODO: Question: when robot is turned on, what will be the default scoring direction? Back,
+  // I think. And is that different from when cancel is clicked? When cancel is clicked,
+  // I think we said that direction does not change, but I think it has to in order to have
+  // a mutually consistent starting state between firmware and robot. So I say when cancelled,
+  // direction flips to front.
+  if (cancelSelector.clicked()) {
+    digitalWrite(frontLEDPin, HIGH);
+    digitalWrite(backLEDPin, LOW);
+    digitalWrite(ballLEDPin, LOW);
+    digitalWrite(hatchLEDPin, LOW);
+    digitalWrite(rocketLEDPin, LOW);
+    digitalWrite(cargoShipLEDPin, LOW);
+    digitalWrite(highHeightLEDPin, LOW);
+    digitalWrite(mediumHeightLEDPin, LOW);
+    digitalWrite(lowHeightLEDPin, LOW);
+    digitalWrite(intakeLEDPin, LOW);
   }
   
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash

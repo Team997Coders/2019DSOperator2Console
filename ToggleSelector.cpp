@@ -3,11 +3,10 @@
 
 // Constructor
 ToggleSelector::ToggleSelector(int ledPin,
-    int joystickButtonId) {
+    int joystickButtonId): Selector() {
   // Initialize member variables
   this->ledPin = ledPin;
   this->joystickButtonId = joystickButtonId;
-  this->clickedFlag = false;
 }
 
 // Must call in setup to wire up pins and debouncer
@@ -27,18 +26,18 @@ void ToggleSelector::update() {
   // Take care of the selector button
   if (buttonDebouncer->update()) {
     if (buttonDebouncer->fallingEdge()) {
-      // toggle LED
-      digitalWrite(ledPin, !digitalRead(ledPin));
-      // Simulate pressing Joystick button
-      Joystick.button(joystickButtonId, HIGH);
+      if (canValidate() && isValid()) {
+        // toggle LED
+        digitalWrite(ledPin, !digitalRead(ledPin));
+        // Simulate pressing Joystick button
+        Joystick.button(joystickButtonId, HIGH);
+      }
     } else if (buttonDebouncer->risingEdge()) {
-      // Simulate releasing Joystick button
-      Joystick.button(joystickButtonId, LOW);
-      clickedFlag = true;
+      if (canValidate() && isValid()) {
+        // Simulate releasing Joystick button
+        Joystick.button(joystickButtonId, LOW);
+        clickedFlag = true;
+      }
     }
   }  
-}
-
-bool ToggleSelector::clicked() {
-  return clickedFlag;
 }
