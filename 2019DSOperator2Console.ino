@@ -255,13 +255,14 @@ void loop() {
   scoringDirectionSelector.update();
   scoringArtifactSelector.update();
   scoringDestinationSelector.update();
-  activateSelector.update();
+  // The height updaters must run AFTER the destination updater
   highHeightSelector.update();
   mediumHeightSelector.update();
   lowHeightSelector.update();
   heightSelectorGroup.update();
-  cancelSelector.update();
   intakeSelector.update();
+  activateSelector.update();
+  cancelSelector.update();
   ASelector.update();
   BSelector.update();
   XSelector.update();
