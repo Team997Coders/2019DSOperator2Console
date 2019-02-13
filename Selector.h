@@ -4,7 +4,11 @@
 // Declare a function pointer type must return a bool
 typedef bool (* function_pointer_t) ();
 
+bool alwaysValid();
+
 class Selector {
+  private:
+  
   // Declare class member variables initialied via constructor
   protected:
   bool clickedFlag;

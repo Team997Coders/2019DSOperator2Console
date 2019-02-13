@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include "Selector.h"
 
+bool alwaysValid() {return true;}
+
 // Constructor
 Selector::Selector() {
   // Initialize member variables
   this->clickedFlag = false;
-  this->isValid = NULL;
+  this->isValid = alwaysValid;
 }
 
 // Indicates whether validator callback function has been set and is thus callable.
