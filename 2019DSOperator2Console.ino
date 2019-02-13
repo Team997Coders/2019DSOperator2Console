@@ -262,6 +262,9 @@ void setup() {
   rightPushButtonDebouncer.attach(rightButtonPin, INPUT_PULLUP);
   rightPushButtonDebouncer.interval(debounceTimeInMs);
   rightSelector.begin(&rightPushButtonDebouncer);
+
+  // Back is enabled at first power on
+  digitalWrite(backLEDPin, HIGH);
 }
 
 // This runs forever
@@ -291,13 +294,9 @@ void loop() {
     heightSelectorGroup.allOff();
   }
 
-  // TODO: Question: when robot is turned on, what will be the default scoring direction? Back,
-  // I think. And is that different from when cancel is clicked? When cancel is clicked,
-  // I think we said that direction does not change, but I think it has to in order to have
-  // a mutually consistent starting state between firmware and robot. So I say when cancelled,
-  // direction flips to front.
+  // Clear LEDs when cancel clicked
   if (cancelSelector.clicked()) {
-    digitalWrite(frontLEDPin, HIGH);
+    digitalWrite(frontLEDPin, LOW);
     digitalWrite(backLEDPin, LOW);
     digitalWrite(ballLEDPin, LOW);
     digitalWrite(hatchLEDPin, LOW);
