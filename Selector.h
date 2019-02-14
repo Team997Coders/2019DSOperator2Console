@@ -12,6 +12,7 @@ class Selector {
   // Declare class member variables initialied via constructor
   protected:
   bool clickedFlag;
+  bool didFall;
 
   // Callback function returing bool indicating it is ok to click
   // Set with SetValidator

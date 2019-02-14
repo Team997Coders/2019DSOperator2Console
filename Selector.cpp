@@ -7,6 +7,7 @@ bool alwaysValid() {return true;}
 Selector::Selector() {
   // Initialize member variables
   this->clickedFlag = false;
+  this->didFall = false;
   this->isValid = alwaysValid;
 }
 

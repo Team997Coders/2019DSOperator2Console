@@ -18,14 +18,19 @@ void MomentarySelectorPOV::update() {
   // Take care of the selector button
   if (buttonDebouncer->update()) {
     if (buttonDebouncer->fallingEdge()) {
+      didFall = true;
       if (canValidate() && isValid()) {
         // Simulate settings POV to angle
         Joystick.hat(joystickHatAngle);
+        clickedFlag = true;
       }
     } else if (buttonDebouncer->risingEdge()) {
       if (canValidate() && isValid()) {
-        clickedFlag = true;
+        if (didFall) {
+          clickedFlag = true;
+        }
       }
+      didFall = false;
     }
   }  
 }

@@ -26,6 +26,7 @@ void MutuallyExclusiveSelector::update() {
   // Take care of the selector button
   if (buttonDebouncer->update()) {
     if (buttonDebouncer->fallingEdge()) {
+      didFall = true;
       if (canValidate() && isValid()) {
         // set LED to high always if this button is pushed
         digitalWrite(ledPin, HIGH);
@@ -36,7 +37,9 @@ void MutuallyExclusiveSelector::update() {
       if (canValidate() && isValid()) {
         // Simulate releasing Joystick button
         Joystick.button(joystickButtonId, LOW);
-        clickedFlag = true;
+        if (didFall) {
+          clickedFlag = true;
+        }
       }
     }
   }  

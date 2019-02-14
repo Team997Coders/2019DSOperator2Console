@@ -26,6 +26,7 @@ void ToggleSelector::update() {
   // Take care of the selector button
   if (buttonDebouncer->update()) {
     if (buttonDebouncer->fallingEdge()) {
+      didFall = true;
       if (canValidate() && isValid()) {
         // toggle LED
         digitalWrite(ledPin, !digitalRead(ledPin));
@@ -36,7 +37,9 @@ void ToggleSelector::update() {
       if (canValidate() && isValid()) {
         // Simulate releasing Joystick button
         Joystick.button(joystickButtonId, LOW);
-        clickedFlag = true;
+        if (didFall) {
+          clickedFlag = true;        
+        }
       }
     }
   }  

@@ -18,6 +18,7 @@ void MomentarySelector::update() {
   // Take care of the selector button
   if (buttonDebouncer->update()) {
     if (buttonDebouncer->fallingEdge()) {
+      didFall = true;
       if (canValidate() && isValid()) {
         // Simulate pressing Joystick button
         Joystick.button(joystickButtonId, HIGH);
@@ -26,8 +27,11 @@ void MomentarySelector::update() {
       if (canValidate() && isValid()) {
         // Simulate releasing Joystick button
         Joystick.button(joystickButtonId, LOW);
-        clickedFlag = true;
+        if (didFall) {
+          clickedFlag = true;
+        }
       }
+      didFall = false;
     }
   }  
 }

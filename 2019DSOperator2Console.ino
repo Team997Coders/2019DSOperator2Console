@@ -165,18 +165,6 @@ bool heightValidator() {
   }
 }
 
-// Back/Hatch/Rocket is an invalid combination
-bool destinationValidator() {
-  // Note that this method will get called when we are attempting
-  // to transition FROM cargo ship TO rocket, so thus why we
-  // are looking for cargo ship to be true
-  if (digitalRead(backLEDPin) && digitalRead(hatchLEDPin) && digitalRead(cargoShipLEDPin)) {
-    return false;
-  } else {
-    return true;
-  }
-}
-
 // This is run once at device startup
 void setup() {
   pinMode(iAmAliveLEDPin, OUTPUT);
@@ -195,7 +183,6 @@ void setup() {
   scoringDestinationButtonDebouncer.attach(scoringDestinationButtonPin, INPUT_PULLUP);
   scoringDestinationButtonDebouncer.interval(debounceTimeInMs);
   scoringDestinationSelector.begin(&scoringDestinationButtonDebouncer);
-  scoringDestinationSelector.setValidator(destinationValidator);
 
   // Activate selector setup
   activatePushButtonDebouncer.attach(activateButtonPin, INPUT_PULLUP);
@@ -288,12 +275,24 @@ void loop() {
   centerSelector.update();
   rightSelector.update();
 
-  // Scoring on cargo ship has no height setting, so clear the height selector group
-  // if the cargo ship led is lit.
-  if (digitalRead(cargoShipLEDPin)) {
-    heightSelectorGroup.allOff();
+  // We can get to this condition from direction or artifact selections
+  // so if we get here, flip the display to cargo ship. Back/Hatch/Rocket is not valid.
+  // DeepspaceOperator2Console.java will set the state on its side to deal with this condition
+  // to keep state in sync.
+  if (scoringDirectionSelector.clicked() || scoringDestinationSelector.clicked() || scoringArtifactSelector.clicked()) {
+    if (digitalRead(backLEDPin) && digitalRead(hatchLEDPin) && digitalRead(rocketLEDPin)) {
+      digitalWrite(rocketLEDPin, LOW);
+      digitalWrite(cargoShipLEDPin, HIGH);
+      heightSelectorGroup.allOff();
+    }
   }
 
+  // Scoring on cargo ship has no height setting, so clear the height selector group
+  // if the cargo ship led is lit. This needs to be AFTER the back/hatch/rocket check.
+  if (scoringDestinationSelector.clicked() && digitalRead(cargoShipLEDPin)) {
+    heightSelectorGroup.allOff();
+  }
+  
   // Clear LEDs when cancel clicked
   if (cancelSelector.clicked()) {
     digitalWrite(frontLEDPin, LOW);
@@ -307,10 +306,14 @@ void loop() {
     digitalWrite(lowHeightLEDPin, LOW);
     digitalWrite(intakeLEDPin, LOW);
   }
-  
+
   // Give observer hope that we are alive and kicking...onboard Teensy LED will flash
   if (iAmAliveLastBlinked > iAmAliveBlinkEveryInMs) {
     iAmAliveLastBlinked = 0;
-    digitalWrite(iAmAliveLEDPin, !digitalRead(iAmAliveLEDPin));    
+    toggleIAmAlive();
   }
+}
+
+void toggleIAmAlive() {
+  digitalWrite(iAmAliveLEDPin, !digitalRead(iAmAliveLEDPin));
 }

@@ -33,6 +33,7 @@ void TriStateSelector::update() {
   if (buttonDebouncer->update()) {
     // Button is clicked
     if (buttonDebouncer->fallingEdge()) {
+      didFall = true;
       if (canValidate() && isValid()) {
         // Left is first reading left to right, so that state goes first when in the 'none' state.
         // If 'None' state...
@@ -61,8 +62,11 @@ void TriStateSelector::update() {
         } else if (digitalRead(rightLEDPin)) {
           Joystick.button(rightJoystickButtonId, LOW);        
         }
-        clickedFlag = true;
+        if (didFall) {
+          clickedFlag = true;
+        }
       }
+      didFall = false;
     }
   }  
 }
