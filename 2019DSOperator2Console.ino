@@ -26,31 +26,33 @@
 // Debounce settings
 const int debounceTimeInMs = 10;
 
+// Pins marked with done were re-mapped when button board was assembled
+
 // Define Teensy pins
 const int iAmAliveLEDPin = 13;
-const int AButtonPin = 14;
-const int BButtonPin = 15;
-const int XButtonPin = 16;
-const int leftButtonPin = 17;
-const int centerButtonPin = 18;
-const int rightButtonPin = 19;
+const int AButtonPin = 25;                // done
+const int BButtonPin = 26;                // done
+const int XButtonPin = 27;                // done
+const int leftButtonPin = 30;             // done
+const int centerButtonPin = 28;           // done
+const int rightButtonPin = 29;            // done
 const int intakeLEDPin = 20;
-const int intakeButtonPin = 21;
-const int cancelButtonPin = 22;
+const int intakeButtonPin = 31;             // done
+const int cancelButtonPin = 32;             // done
 const int highHeightLEDPin = 23;
-const int highHeightButtonPin = 24;
-const int scoringDestinationButtonPin = 25;
+const int highHeightButtonPin = 39;         // done
+const int scoringDestinationButtonPin = 35; // done
 const int cargoShipLEDPin = 26;
 const int rocketLEDPin = 27;
 const int lowHeightLEDPin = 28;
-const int lowHeightButtonPin = 29;
-const int activateButtonPin = 30;
+const int lowHeightButtonPin = 34;          // done
+const int activateButtonPin = 33;           // done
 const int mediumHeightLEDPin = 31;
-const int mediumHeightButtonPin = 32;
+const int mediumHeightButtonPin = 37;       // done
 const int ballLEDPin = 33;
 const int hatchLEDPin = 34;
-const int scoringArtifactButtonPin = 35;
-const int scoringDirectionButtonPin = 36;
+const int scoringArtifactButtonPin = 36;  // done
+const int scoringDirectionButtonPin = 38; // done
 const int frontLEDPin = 37;
 const int backLEDPin = 38;
 
