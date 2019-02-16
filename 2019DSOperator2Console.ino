@@ -288,6 +288,13 @@ void loop() {
       heightSelectorGroup.allOff();
     }
   }
+  //Front ball rocket high invalid
+  if (scoringDirectionSelector.clicked() || scoringDestinationSelector.clicked() || scoringArtifactSelector.clicked() || highHeightSelector.clicked()) {
+    if (digitalRead(frontLEDPin) && digitalRead(ballLEDPin) && digitalRead(rocketLEDPin) && digitalRead(highHeightLEDPin)) {
+      digitalWrite(highHeightLEDPin, LOW);
+      digitalWrite(mediumHeightLEDPin, HIGH);
+    }
+  }
 
   // Scoring on cargo ship has no height setting, so clear the height selector group
   // if the cargo ship led is lit. This needs to be AFTER the back/hatch/rocket check.
